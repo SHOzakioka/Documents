@@ -1,0 +1,37 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+package config {
+    class SecurityConfig {
+        + securityFilterChain: SecurityFilterChain
+        + passwordEncoder: PasswordEncoder
+    }
+}
+
+package domain {
+    package entity {
+        interface UserDetails
+        class UserAuths implements UserDetails
+        class UserInfos
+    }
+
+    package repository {
+        interface JpaRepository<T, ID>
+        interface UserAuthRepository extends JpaRepository {
+            + findByUsername: Optional<UserAuths>
+        }
+        interface UserInfosRepository extends JpaRepository
+    }
+
+    package service {
+        interface UserDetailsService
+        class UserDetailsServiceImpl implements UserDetailsService {
+            + loadUserByUsername: UserDetails
+            + registerUser: void
+        }
+    }
+}
+
+config.SecurityConfig --u-> domain.service.UserDetailsServiceImpl : USES
+domain.service.UserDetailsServiceImpl -l-> UserAuthRepository : USES(DI)
+@enduml
