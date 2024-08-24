@@ -1,49 +1,51 @@
 @startuml
+!pragma charset utf-8
 title 初回ログイン処理のシーケンス図
 
-participant User as ユーザー
-participant LoginController as コントローラー
-participant SecurityConfig as 設定
-participant AuthenticationManager as 認証マネージャー
-participant UserDetailsServiceImpl as サービス
-participant UserAuthRepository as リポジトリ
-participant UserAuths as エンティティ
-participant PasswordEncoder as パスワードエンコーダー
+participant User
+participant LoginController
+participant SecurityConfig
+participant AuthenticationManager
+participant UserDetailsServiceImpl
+participant UserAuthRepository
+participant UserAuths
+participant PasswordEncoder
 
-activate ユーザー
-ユーザー -> コントローラー: ログインフォーム送信
-activate コントローラー
+User -> LoginController: ログインフォーム送信
+activate User
+activate LoginController
 
-    コントローラー -> 設定: 認証設定取得
-    activate 設定
+    LoginController -> SecurityConfig: 認証設定取得
+    activate SecurityConfig
 
-    設定 -> コントローラー: 認証設定返却
-    deactivate 設定
+    SecurityConfig -> LoginController: 認証設定返却
+    deactivate SecurityConfig
 
-        コントローラー -> 認証マネージャー: 認証実行(username, password)
-        activate 認証マネージャー
-        認証マネージャー -> サービス: ユーザー情報取得(username)
-        activate サービス
-        サービス -> リポジトリ: ユーザー検索(username)
-        activate リポジトリ
-        リポジトリ -> エンティティ: データベースから取得
-        activate エンティティ
-        エンティティ --> リポジトリ: ユーザー情報返却
-        deactivate エンティティ
-        リポジトリ --> サービス: UserAuthオブジェクト返却
-        deactivate リポジトリ
-        サービス -> パスワードエンコーダー: パスワード照合
-        activate パスワードエンコーダー
-        パスワードエンコーダー --> サービス: 照合結果
-        deactivate パスワードエンコーダー
-        サービス -> 認証マネージャー: 認証結果返却
-        deactivate サービス
+        LoginController -> AuthenticationManager: 認証実行(username, password)
+        activate AuthenticationManager
+        AuthenticationManager -> UserDetailsServiceImpl: ユーザー情報取得(username)
 
-    認証マネージャー -> コントローラー: 認証結果返却
-    deactivate 認証マネージャー
+        activate UserDetailsServiceImpl
+        UserDetailsServiceImpl -> UserAuthRepository: ユーザー検索(username)
+        activate UserAuthRepository
+        UserAuthRepository -> UserAuths: データベースから取得
+        activate UserAuths
+        UserAuths --> UserAuthRepository: ユーザー情報返却
+        deactivate UserAuths
+        UserAuthRepository --> UserDetailsServiceImpl: UserAuthオブジェクト返却
+        deactivate UserAuthRepository
+        UserDetailsServiceImpl -> PasswordEncoder: パスワード照合
+        activate PasswordEncoder
+        PasswordEncoder --> UserDetailsServiceImpl: 照合結果
+        deactivate PasswordEncoder
+        UserDetailsServiceImpl -> AuthenticationManager: 認証結果返却
+        deactivate UserDetailsServiceImpl
 
-コントローラー -> ユーザー: 認証成功/失敗
-deactivate コントローラー
-deactivate ユーザー
+    AuthenticationManager -> LoginController: 認証結果返却
+    deactivate AuthenticationManager
+
+LoginController -> User: 認証成功/失敗
+deactivate LoginController
+deactivate User
 
 @enduml
