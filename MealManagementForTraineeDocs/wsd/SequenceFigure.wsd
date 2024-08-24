@@ -2,50 +2,56 @@
 !pragma charset utf-8
 title 初回ログイン処理のシーケンス図
 
-participant User
-participant LoginController
-participant SecurityConfig
+actor User
+participant "ログインフォーム" as LoginForm
+participant "Spring Security Filter Chain" as SecurityFilter
 participant AuthenticationManager
 participant UserDetailsServiceImpl
 participant UserAuthRepository
 participant UserAuths
 participant PasswordEncoder
 
-User -> LoginController: ログインフォーム送信
-activate User
-activate LoginController
+User -> LoginForm: ログインフォーム送信
+activate LoginForm
 
-    LoginController -> SecurityConfig: 認証設定取得
-    activate SecurityConfig
+LoginForm -> SecurityFilter: リクエスト転送
+deactivate LoginForm
+activate SecurityFilter
 
-    SecurityConfig -> LoginController: 認証設定返却
-    deactivate SecurityConfig
+SecurityFilter -> AuthenticationManager: 認証実行(username, password)
+activate AuthenticationManager
 
-        LoginController -> AuthenticationManager: 認証実行(username, password)
-        activate AuthenticationManager
-        AuthenticationManager -> UserDetailsServiceImpl: ユーザー情報取得(username)
+AuthenticationManager -> UserDetailsServiceImpl: ユーザー情報取得(username)
+activate UserDetailsServiceImpl
 
-        activate UserDetailsServiceImpl
-        UserDetailsServiceImpl -> UserAuthRepository: ユーザー検索(username)
-        activate UserAuthRepository
-        UserAuthRepository -> UserAuths: データベースから取得
-        activate UserAuths
-        UserAuths --> UserAuthRepository: ユーザー情報返却
-        deactivate UserAuths
-        UserAuthRepository --> UserDetailsServiceImpl: UserAuthオブジェクト返却
-        deactivate UserAuthRepository
-        UserDetailsServiceImpl -> PasswordEncoder: パスワード照合
-        activate PasswordEncoder
-        PasswordEncoder --> UserDetailsServiceImpl: 照合結果
-        deactivate PasswordEncoder
-        UserDetailsServiceImpl -> AuthenticationManager: 認証結果返却
-        deactivate UserDetailsServiceImpl
+UserDetailsServiceImpl -> UserAuthRepository: ユーザー検索(username)
+activate UserAuthRepository
 
-    AuthenticationManager -> LoginController: 認証結果返却
-    deactivate AuthenticationManager
+UserAuthRepository -> UserAuths: データベースから取得
+activate UserAuths
+UserAuths --> UserAuthRepository: ユーザー情報返却
+deactivate UserAuths
 
-LoginController -> User: 認証成功/失敗
-deactivate LoginController
-deactivate User
+UserAuthRepository --> UserDetailsServiceImpl: UserAuthオブジェクト返却
+deactivate UserAuthRepository
+
+UserDetailsServiceImpl --> AuthenticationManager: UserDetails返却
+deactivate UserDetailsServiceImpl
+
+AuthenticationManager -> PasswordEncoder: パスワード照合
+activate PasswordEncoder
+PasswordEncoder --> AuthenticationManager: 照合結果
+deactivate PasswordEncoder
+
+AuthenticationManager --> SecurityFilter: 認証結果返却
+deactivate AuthenticationManager
+
+alt 認証成功
+    SecurityFilter --> User: リダイレクト（ログイン成功ページ）
+else 認証失敗
+    SecurityFilter --> User: リダイレクト（ログイン失敗ページ）
+end
+
+deactivate SecurityFilter
 
 @enduml
