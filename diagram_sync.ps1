@@ -40,9 +40,8 @@ if (-not (Test-Path $IMAGE_FILE)) {
 # Gitの操作
 Write-Host "Syncing with Git repository"
 
-git add $WSD_FILE
-git add $IMAGE_FILE
-git commit -m "Update diagram: $WsdFileName"
+git add -u $BASE_DIR/
+git commit -m "Update files change in Documents dir."
 git push
 
 Write-Host "Diagram sync completed successfully"
