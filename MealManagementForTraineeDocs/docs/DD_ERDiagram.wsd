@@ -1,0 +1,282 @@
+@startuml
+
+' Entities
+'' 凡例
+entity "凡例" {
+  + PRIMARY_KEY
+  --
+  * NOT_NULL
+  **FORIGN_KEY**
+}
+
+'' user
+entity "user_infos" {
+  + **user_id** : UUID(255)
+  --
+  * user_name : VARCHAR(20)
+  * user_name_kana : VARCHAR(20)
+  * birthday : DATE(10)
+  * age : INT(2)
+  * **sex_id** : INT(1)
+  height : NUMERIC(4,2)
+  * **body_make_setting_id** : INT
+  * created_at : TIMESTAMP
+  * updated_at : TIMESTAMP
+}
+
+entity "user_auths" {
+  + **user_id** : UUID
+  --
+  * email : VARCHAR(100)
+  * password_hash : VARCHAR(255)
+  * created_at : TIMESTAMP
+  * updated_at : TIMESTAMP
+}
+
+entity "body_metrics" {
+  + user_id : UUID
+  + record_date : DATE
+  --
+  weight : NUMERIC(4,2)
+  mar : NUMERIC(4,2)
+  * created_at : TIMESTAMP
+  * updated_at : TIMESTAMP
+}
+
+entity "tdee_summaries" {
+  + user_id : UUID
+  + record_date : DATE
+  --
+  tdee : NUMERIC(4,2)
+  tea : NUMERIC(4,2)
+  tef : NUMERIC(4,2)
+  * created_at : TIMESTAMP
+  * updated_at : TIMESTAMP
+}
+
+entity "body_make_settings" {
+  + body_make_setting_id : UUID
+  --
+  * **mode_id** : INT
+  * **level_id** : INT
+  * **meal_style_id** : INT
+  * created_at : TIMESTAMP
+  * updated_at : TIMESTAMP
+}
+
+entity "sex_infos" {
+  + sex_id : INT
+  --
+  * sex_name : VARCHAR(10)
+}
+
+entity "modes" {
+  + mode_id : INT
+  --
+  * mode_name : VARCHAR(10)
+}
+
+entity "levels" {
+  + level_id : INT
+  --
+  * level_name : VARCHAR(10)
+}
+
+entity "meal_styles" {
+  + meal_style_id : INT
+  --
+  * meal_style_name : VARCHAR(10)
+}
+
+
+
+'' food
+entity "tdci_summaries" {
+  + tdci_summary_id : UUID
+  --
+  * **meal_record_id** : INT
+  * **user_id** : UUID
+  * amount : NUMERIC(4,2)
+  * tdci : NUMERIC(4,2)
+  * protain : NUMERIC(4,2)
+  * fat : NUMERIC(4,2)
+  * carbon : NUMERIC(4,2)
+  * created_at : TIMESTAMP
+  * updated_at : TIMESTAMP
+}
+
+
+
+entity "tdci_meal_links" {
+  + dmeal_meal_link_id : UUID
+  --
+  * **tdci_summary_id** : UUID
+  * **meal_summary_id** : UUID
+
+}
+
+entity "meal_summaries" {
+  + meal_summary_id : UUID
+  --
+  * **meal_food_links_id** : UUID
+  * **user_id** : UUID
+  * **meal_timing_id** : INT
+  * meal_amount : NUMERIC(4,2)
+  * meal_calory : NUMERIC(4,2)
+  * meal_protain : NUMERIC(4,2)
+  * meal_fat : NUMERIC(4,2)
+  * meal_carbon : NUMERIC(4,2)
+  * remarks : VARCHAR(500)
+  * created_at : TIMESTAMP
+  * updated_at : TIMESTAMP
+}
+
+entity "meal_food_links" {
+  + meal_food_links_id : UUID
+  --
+  * **meal_summary_id** : UUID
+  * **food_summary_id** : UUID
+}
+
+entity "food_summaries" {
+  + food_summary_id : UUID
+  --
+  * **food_composition_id** : UUID
+  * **user_id** : UUID
+  * record_date : TIMESTAMP
+  * magnification : NUMERIC(2,1)
+  * food_amount : NUMERIC(4,2)
+  * food_calory : NUMERIC(4,2)
+  * food_protain : NUMERIC(4,2)
+  * food_fat : NUMERIC(4,2)
+  * food_carbon : NUMERIC(4,2)
+  * created_at : TIMESTAMP
+  * updated_at : TIMESTAMP
+}
+
+
+entity "food_compositions" {
+  + food_composition_id : UUID
+  --
+  * **user_id** : UUID
+  * **food_unit_id** : INT
+  * **food_group_id** : INT
+  * food_name : VARCHAR(50)
+  * unit_amount : NUMERIC(6,2)
+  * unit_calory_intake : NUMERIC(6,2)
+  * unit_protain : NUMERIC(4,2)
+  * unit_fat : NUMERIC(4,2)
+  * unit_carbon : NUMERIC(4,2)
+  * created_at : TIMESTAMP
+  * updated_at : TIMESTAMP
+}
+
+entity "meal_timings" {
+  * meal_timing_id : INT
+  --
+  * meal_timing_name : VARCHAR(2) --朝、昼、夜、間食
+  * created_at : TIMESTAMP
+  * updated_at : TIMESTAMP
+}
+
+entity "food_groups" {
+  + food_unit_id : INT
+  --
+  * food_unit_name : CHAR(15) --単位名
+  * food_unit_flag : BOOLEAN  --可算、不可算
+  * created_at : TIMESTAMP
+  * updated_at : TIMESTAMP
+}
+
+entity "food_units" {
+  + food_id : INT
+  --
+  * food_group_name : CHAR(15)
+  * created_at : TIMESTAMP
+  * updated_at : TIMESTAMP
+}
+
+entity "meal_types" {
+  + meal_type_id : INT
+  --
+  * meal_timing_name : CHAR(2)
+  * created_at : TIMESTAMP
+  * updated_at : TIMESTAMP
+}
+
+
+entity "ideal_tdci_summaries" {
+  + tdci_id : UUID
+  --
+  * **user_id** : UUID
+  * tdci : NUMERIC(4,2)
+  * protain : NUMERIC(4,2)
+  * fat : NUMERIC(4,2)
+  * carbon : NUMERIC(4,2)
+  * created_at : TIMESTAMP
+  * updated_at : TIMESTAMP
+}
+
+entity "ideal_tdee_summaries" {
+  + tdee_id : UUID
+  --
+  * **user_id** : UUID
+  * tdee : NUMERIC(4,2)
+  * tea : NUMERIC(4,2)
+  * tef : NUMERIC(4,2)
+  * mar : NUMERIC(4,2)
+  * created_at : TIMESTAMP
+  * updated_at : TIMESTAMP
+}
+
+' note
+note right of tdci_summaries
+  1日の食事を記録する
+end note
+
+note left of tdci_meal_links
+  中間テーブル
+end note
+
+note right of meal_summaries
+  1回の食事を記録する
+  朝、昼、夜、間食別に記録する
+end note
+
+note right of meal_food_links
+  中間テーブル
+end note
+
+note right of food_summaries
+  単位食品に倍率を掛けた結果を記録する
+  例) 鮭100gという基準値に対して、1.5倍掛けた時の結果
+end note
+
+' Relationships
+'' user
+user_infos ||-u-o{ body_metrics
+user_infos ||-u-|| user_auths
+user_infos }o-u-|| sex_infos
+user_infos }o-l-|| body_make_settings
+user_infos ||-d-o{ tdee_summaries
+user_infos ||-d-o{ ideal_tdee_summaries
+user_infos ||-r-o{ ideal_tdci_summaries
+user_infos ||-r-o{ tdci_summaries
+body_make_settings }|-l-|| modes
+body_make_settings }|--|| levels
+body_make_settings }|--|| meal_styles
+
+'' food
+tdci_summaries }o--|| tdci_meal_links
+tdci_meal_links |o--o{ meal_summaries
+meal_summaries }o--|| meal_food_links
+meal_summaries }o--|| meal_timings
+meal_food_links |o--o{ food_summaries
+food_summaries }o--|| food_compositions
+food_compositions }o--|| food_groups
+food_compositions }o--|| food_units
+food_compositions }o--|| meal_types
+
+'' summaries
+
+@enduml

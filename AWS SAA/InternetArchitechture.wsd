@@ -1,0 +1,70 @@
+@startuml
+
+skinparam rectangle {
+    BackgroundColor #FFEBE9
+    BorderColor black
+    BorderThickness 1
+    RoundCorner 10
+}
+
+skinparam cloud {
+    BackgroundColor #AAD4FF
+    BorderColor black
+    BorderThickness 1
+    RoundCorner 10
+}
+
+skinparam frame {
+    BackgroundColor #FFF5BA
+    BorderColor black
+    BorderThickness 1
+    RoundCorner 10
+}
+
+cloud "AWS Region" {
+    frame "VPC" {
+        
+        rectangle "Internet Gateway" as igw
+        rectangle "Network ACL" as nacl
+
+        frame "AZ 1" {
+            rectangle "Public Subnet\n(10.0.1.0/24)" {
+                rectangle "EC2 Instance\n(Public)" as ec2_public1
+                rectangle "Security Group" as sg_public1
+            }
+            rectangle "Private Subnet\n(10.0.2.0/24)" {
+                rectangle "EC2 Instance\n(Private)" as ec2_private1
+            }
+        }
+
+        frame "AZ 2" {
+            rectangle "Public Subnet\n(10.0.3.0/24)" {
+                rectangle "EC2 Instance\n(Public)" as ec2_public2
+                rectangle "Security Group" as sg_public2
+            }
+            rectangle "Private Subnet\n(10.0.4.0/24)" {
+                rectangle "EC2 Instance\n(Private)" as ec2_private2
+            }
+        }
+
+        frame "AZ 3" {
+            rectangle "Public Subnet\n(10.0.5.0/24)" {
+                rectangle "EC2 Instance\n(Public)" as ec2_public3
+                rectangle "Security Group" as sg_public3
+            }
+            rectangle "Private Subnet\n(10.0.6.0/24)" {
+                rectangle "EC2 Instance\n(Private)" as ec2_private3
+            }
+        }
+
+        igw --> nacl : "Internet Gateway"
+        nacl --> sg_public1 : "Network ACL"
+        nacl --> sg_public2
+        nacl --> sg_public3
+    }
+}
+
+cloud "Internet" as internet
+internet --> igw : "Internet Gateway"
+
+@enduml
