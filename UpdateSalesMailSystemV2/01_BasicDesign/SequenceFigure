@@ -1,0 +1,36 @@
+@startuml
+actor "ユーザー" as user
+participant "kintone" as K
+participant "API Gateway" as API
+participant "SNS" as SNS
+participant "CloudWatch" as CW
+participant "AWS Lambda" as Lambda
+participant "RDS (MySQL)" as RDS
+participant "S3" as S3
+
+activate user
+user -> K: データを更新
+activate K
+K -> API: Webhookでデータを送信
+deactivate K
+activate API
+API -> Lambda: イベントを送信
+deactivate API
+activate Lambda
+alt 成功パターン
+    Lambda -> RDS: SQLクエリを送信
+    Lambda -> S3: スキルシートを送信
+    Lambda -> CW: 成功をログ
+else 失敗パターン
+    Lambda -> CW: 失敗をログ
+    deactivate Lambda
+    activate CW
+    CW -> SNS: メールを送信
+        activate SNS
+        SNS -> user: メールを送信
+        deactivate SNS
+    user -> CW: 結果を閲覧
+    deactivate CW
+end
+deactivate user
+@enduml
